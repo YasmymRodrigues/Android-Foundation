@@ -1,13 +1,14 @@
 package com.example.calculator
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.calculator.databinding.ItemExpressionBinding
 
 
 
-class HistoryAdapter(private val onOperationClick: (String) -> Unit, private var items: List<String> = listOf()) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
+class HistoryAdapter(private val onOperationClick: (String) -> Unit, private val onOperationLongClick: (Long) -> Unit, private var items: List<OperationUi> = listOf()) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
         class HistoryViewHolder(val binding: ItemExpressionBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -21,16 +22,24 @@ class HistoryAdapter(private val onOperationClick: (String) -> Unit, private var
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         holder.itemView.setOnClickListener {
-            onOperationClick(items[position])
+            onOperationClick(items[position].expression)
+            onOperationClick(items[position].result)
         }
-        val parts = items[position]?.split("=")
-        holder.binding.textExpression.text = parts?.get(0)
-        holder.binding.textResult.text = parts?.get(1)
+        holder.itemView.setOnLongClickListener{
+            onOperationLongClick(items[position].timeStamp)
+            true
+        }
+
+
+
+        val parts = items[position].expression
+        holder.binding.textExpression.text = parts?.get(0).toString()
+        holder.binding.textResult.text = parts?.get(1).toString()
     }
 
     override fun getItemCount() = items.size
 
-    fun updatedItems(items: List<String>) {
+    fun updatedItems(items: List<OperationUi>) {
         this.items = items
         notifyDataSetChanged()
     }
