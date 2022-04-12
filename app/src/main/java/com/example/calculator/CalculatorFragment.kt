@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.calculator.databinding.FragmentCalculatorBinding
 import net.objecthunter.exp4j.ExpressionBuilder
@@ -14,17 +15,22 @@ import java.text.SimpleDateFormat
 
 
 class CalculatorFragment : Fragment() {
-    private val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: FragmentCalculatorBinding
+    private lateinit var viewModel: CalculatorViewModel
     private val operations = mutableListOf<OperationUi>();
     private val adapter = HistoryAdapter(::onOperationClick, ::onLongClick)
     var someDate: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(
             R.layout.fragment_calculator, container, false
         )
         binding = FragmentCalculatorBinding.bind(view)
+        viewModel = ViewModelProvider(this).get(
+            CalculatorViewModel::class.java
+        )
+        binding.textVisor.text = viewModel.getDisplayValue()
         return binding.root
     }
     override fun onStart() {
@@ -42,13 +48,14 @@ class CalculatorFragment : Fragment() {
         //binding.button9?.setOnClickListener { onClickSymbol("9") }
         binding.buttonAdditon.setOnClickListener { onClickSymbol("+") }
         //binding.buttonSubtraction?.setOnClickListener { onClickSymbol("-") }
-        binding.buttonEquals.setOnClickListener { onClickEquals() }
+        binding.buttonEquals.setOnClickListener {
+            binding.textVisor.text = viewModel.onClickEquals() }
         //binding.rvHistoric?.layoutManager = LinearLayoutManager(this)
         //binding.rvHistoric?.adapter = adapter
     }
 
     private fun onClickSymbol(symbols: String){
-        Log.i(TAG, "Click ${symbols}")
+
         if (binding.textVisor.text == "0") {
             binding.textVisor.text = symbols
             //exp += symbols
@@ -59,7 +66,7 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun onClickEquals(){
-        Log.i(TAG, "Click equal")
+
         val expression = ExpressionBuilder(
             binding.textVisor.text.toString()
         ).build()
@@ -68,9 +75,7 @@ class CalculatorFragment : Fragment() {
         adapter.updatedItems(operations)
         val operationUi = OperationUi(expression = "", result = "${binding.textVisor.text}", timeStamp = 11)
         operations.add(operationUi)
-        Log.i(TAG, "The result is ${binding.textVisor.text}")
-        //Log.i(TAG, "Expression: ${exp}")
-        Log.i(TAG, "History: ${operations}")
+
     }
 
     private fun onOperationClick(operation: String) {
@@ -82,7 +87,7 @@ class CalculatorFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        Log.i(TAG, "The method onDestroy was called!")
+
         super.onDestroy()
     }
 }
