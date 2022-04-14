@@ -4,17 +4,17 @@ import net.objecthunter.exp4j.ExpressionBuilder
 
 class Calculator {
 
-    var display: String = "0"
-    private val history = mutableListOf<Operation>
+    var expression: String = "0"
+    private val history = mutableListOf<Operation>()
 
     fun insertSymbol(symbol: String): String {
-        return display
+        return expression
     }
 
     fun performOperation(): Double {
-        val expressionBuilder = ExpressionBuilder(display).build()
+        val expressionBuilder = ExpressionBuilder(expression).build()
         val result = expressionBuilder.evaluate()
-        history.add(Operation(display, result))
+        history.add(Operation(expression, result))
         return result
     }
 }
